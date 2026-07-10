@@ -15,11 +15,11 @@ jobs:
       matrix:
         include:
           - target: skyrim-se
-            cmake_flags: "-DENABLE_SKYRIM_SE=ON -DENABLE_SKYRIM_AE=OFF -DENABLE_SKYRIM_VR=OFF"
+            cmake_flags: -DENABLE_SKYRIM_SE=ON -DENABLE_SKYRIM_AE=OFF -DENABLE_SKYRIM_VR=OFF
           - target: skyrim-ae
-            cmake_flags: "-DENABLE_SKYRIM_SE=OFF -DENABLE_SKYRIM_AE=ON -DENABLE_SKYRIM_VR=OFF"
+            cmake_flags: -DENABLE_SKYRIM_SE=OFF -DENABLE_SKYRIM_AE=ON -DENABLE_SKYRIM_VR=OFF
           - target: skyrim-vr
-            cmake_flags: "-DENABLE_SKYRIM_SE=OFF -DENABLE_SKYRIM_AE=OFF -DENABLE_SKYRIM_VR=ON"
+            cmake_flags: -DENABLE_SKYRIM_SE=OFF -DENABLE_SKYRIM_AE=OFF -DENABLE_SKYRIM_VR=ON
 
     steps:
       - name: Checkout
