@@ -31,16 +31,16 @@ jobs:
       - name: Setup MSVC
         uses: ilammy/msvc-dev-cmd@v1
 
-      - name: Install spdlog
+      - name: Install deps
         run: |
           git clone https://github.com/Microsoft/vcpkg.git ${{ runner.temp }}/vcpkg
           ${{ runner.temp }}/vcpkg/bootstrap-vcpkg.bat
-          ${{ runner.temp }}/vcpkg/vcpkg.exe install spdlog:x64-windows
+          ${{ runner.temp }}/vcpkg/vcpkg.exe install spdlog:x64-windows rapidcsv:x64-windows
 
       - name: Configure CMake
         run: |
           $vcpkgRoot = "${{ runner.temp }}/vcpkg"
-          cmake -B build -S skse-plugin ${{ matrix.cmake_flags }} -DBUILD_TESTS=OFF -DSKSE_SUPPORT_XBYAK=OFF -DCMAKE_PREFIX_PATH="$vcpkgRoot/installed/x64-windows" -Dspdlog_DIR="$vcpkgRoot/installed/x64-windows/share/spdlog"
+          cmake -B build -S skse-plugin ${{ matrix.cmake_flags }} -DBUILD_TESTS=OFF -DSKSE_SUPPORT_XBYAK=OFF -DCMAKE_TOOLCHAIN_FILE="$vcpkgRoot/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows
 
       - name: Build
         run: cmake --build build --config Release
