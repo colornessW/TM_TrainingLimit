@@ -37,7 +37,7 @@ namespace
 		}
 	}
 
-	class PatchTask : public SKSE::detail::TaskDelegate
+	class PatchTask : public SKSE::detail::UIDelegate_v1
 	{
 	public:
 		void Run() override
