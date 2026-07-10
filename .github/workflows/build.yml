@@ -11,20 +11,22 @@ jobs:
   build:
     runs-on: windows-latest
     strategy:
+      fail-fast: false
       matrix:
         include:
           - target: skyrim-se
-            cmake_flags: -DENABLE_SKYRIM_SE=ON -DENABLE_SKYRIM_AE=OFF -DENABLE_SKYRIM_VR=OFF
+            cmake_flags: "-DENABLE_SKYRIM_SE=ON -DENABLE_SKYRIM_AE=OFF -DENABLE_SKYRIM_VR=OFF"
           - target: skyrim-ae
-            cmake_flags: -DENABLE_SKYRIM_SE=OFF -DENABLE_SKYRIM_AE=ON -DENABLE_SKYRIM_VR=OFF
+            cmake_flags: "-DENABLE_SKYRIM_SE=OFF -DENABLE_SKYRIM_AE=ON -DENABLE_SKYRIM_VR=OFF"
           - target: skyrim-vr
-            cmake_flags: -DENABLE_SKYRIM_SE=OFF -DENABLE_SKYRIM_AE=OFF -DENABLE_SKYRIM_VR=ON
+            cmake_flags: "-DENABLE_SKYRIM_SE=OFF -DENABLE_SKYRIM_AE=OFF -DENABLE_SKYRIM_VR=ON"
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          submodules: recursive
+
+      - name: Clone CommonLibSSE-NG
+        run: git clone https://github.com/CharmedBaryon/CommonLibSSE-NG.git skse-plugin/CommonLibSSE-NG
 
       - name: Setup MSVC
         uses: ilammy/msvc-dev-cmd@v1
@@ -36,13 +38,7 @@ jobs:
           .\vcpkg\vcpkg.exe install fmt:x64-windows spdlog:x64-windows
 
       - name: Configure CMake
-        run: |
-          cmake -B build -S skse-plugin `
-            ${{ matrix.cmake_flags }} `
-            -DBUILD_TESTS=OFF `
-            -DSKSE_SUPPORT_XBYAK=OFF `
-            -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" `
-            -DVCPKG_TARGET_TRIPLET=x64-windows
+        run: cmake -B build -S skse-plugin ${{ matrix.cmake_flags }} -DBUILD_TESTS=OFF -DSKSE_SUPPORT_XBYAK=OFF -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows
 
       - name: Build
         run: cmake --build build --config Release
@@ -52,7 +48,7 @@ jobs:
           New-Item -ItemType Directory -Path dist -Force
           Copy-Item build/Release/z_TM_TrainingLimit.dll dist/ -ErrorAction SilentlyContinue
           Copy-Item build/Release/z_TM_TrainingLimit.pdb dist/ -ErrorAction SilentlyContinue
-          Copy-Item dist/TM_TrainingLimit.ini dist/
+          Copy-Item dist/TM_TrainingLimit.ini dist/ -ErrorAction SilentlyContinue
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
