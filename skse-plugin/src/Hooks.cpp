@@ -3,12 +3,15 @@
 #include "Counter.h"
 #include "RE/Skyrim.h"
 #include "SKSE/SKSE.h"
+#include <memory>
 #include <string>
 
 namespace
 {
 	using UnknownCall_t = void(__cdecl*)();
 	UnknownCall_t Original_FortifyAV = nullptr;
+
+	auto g_poller = std::make_shared<std::function<void()>>();
 
 	void PatchTrainingUI()
 	{
@@ -31,33 +34,32 @@ namespace
 		current += "/" + std::to_string(limit);
 
 		if (count >= limit) {
-			rt.trainerSkill.SetText("<font color='#FF4444'>" + current + "</font>");
+			rt.trainerSkill.SetTextHTML(("<font color='#FF4444'>" + current + "</font>").c_str());
 		} else {
 			rt.trainerSkill.SetText(current.c_str());
 		}
 	}
 
-	class PatchTask : public SKSE::detail::UIDelegate_v1
+	void StartUIPolling()
 	{
-	public:
-		void Run() override
+		*g_poller = [p = g_poller]()
 		{
 			auto* ui = RE::UI::GetSingleton();
-			if (!ui) return;
-
-			auto* menu = ui->GetMenu<RE::TrainingMenu>();
-			if (!menu) return;
+			if (!ui || !ui->GetMenu<RE::TrainingMenu>()) return;
 
 			PatchTrainingUI();
 
 			auto* taskIntfc = SKSE::GetTaskInterface();
 			if (taskIntfc) {
-				taskIntfc->AddUITask(new PatchTask());
+				taskIntfc->AddUITask(*p);
 			}
-		}
+		};
 
-		void Dispose() override { delete this; }
-	};
+		auto* taskIntfc = SKSE::GetTaskInterface();
+		if (taskIntfc) {
+			taskIntfc->AddUITask(*g_poller);
+		}
+	}
 
 	class TrainingMenuWatcher : public RE::BSTEventSink<RE::MenuOpenCloseEvent>
 	{
@@ -70,15 +72,14 @@ namespace
 			}
 
 			if (a_event->opening) {
-				auto* taskIntfc = SKSE::GetTaskInterface();
-				if (taskIntfc) {
-					taskIntfc->AddUITask(new PatchTask());
-				}
+				StartUIPolling();
 			}
 
 			return RE::BSEventNotifyControl::kContinue;
 		}
 	};
+
+	TrainingMenuWatcher* g_watcher = nullptr;
 
 	void InstallFortifyAVHook()
 	{
@@ -119,8 +120,6 @@ namespace
 
 		SKSE::log::info("TM_TrainingLimit: FortifyActorValue hook installed at REL::ID(51793)+0xCE");
 	}
-
-	TrainingMenuWatcher* g_watcher = nullptr;
 
 	void InstallMenuWatcher()
 	{
