@@ -35,7 +35,6 @@ jobs:
         run: |
           git clone https://github.com/Microsoft/vcpkg.git ${{ github.workspace }}/vcpkg
           .\vcpkg\bootstrap-vcpkg.bat
-          .\vcpkg\vcpkg.exe install fmt:x64-windows spdlog:x64-windows
 
       - name: Configure CMake
         run: cmake -B build -S skse-plugin ${{ matrix.cmake_flags }} -DBUILD_TESTS=OFF -DSKSE_SUPPORT_XBYAK=OFF -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows
