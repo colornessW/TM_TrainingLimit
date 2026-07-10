@@ -26,7 +26,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Clone CommonLibSSE-NG
-        run: git clone https://github.com/CharmedBaryon/CommonLibSSE-NG.git skse-plugin/CommonLibSSE-NG
+        run: git clone --depth 1 --branch v3.7.0 https://github.com/CharmedBaryon/CommonLibSSE-NG.git skse-plugin/CommonLibSSE-NG
 
       - name: Setup MSVC
         uses: ilammy/msvc-dev-cmd@v1
@@ -38,7 +38,9 @@ jobs:
           ${{ runner.temp }}/vcpkg/vcpkg.exe install spdlog:x64-windows
 
       - name: Configure CMake
-        run: cmake -B build -S skse-plugin ${{ matrix.cmake_flags }} -DBUILD_TESTS=OFF -DSKSE_SUPPORT_XBYAK=OFF -DCMAKE_TOOLCHAIN_FILE="${{ runner.temp }}/vcpkg/scripts/buildsystems/vcpkg.cmake" -Dspdlog_DIR="${{ runner.temp }}/vcpkg/installed/x64-windows/share/spdlog" -DVCPKG_TARGET_TRIPLET=x64-windows
+        run: |
+          $vcpkgRoot = "${{ runner.temp }}/vcpkg"
+          cmake -B build -S skse-plugin ${{ matrix.cmake_flags }} -DBUILD_TESTS=OFF -DSKSE_SUPPORT_XBYAK=OFF -DCMAKE_PREFIX_PATH="$vcpkgRoot/installed/x64-windows" -Dspdlog_DIR="$vcpkgRoot/installed/x64-windows/share/spdlog"
 
       - name: Build
         run: cmake --build build --config Release
