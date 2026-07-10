@@ -1,0 +1,3 @@
+[submodule "skse-plugin/CommonLibSSE-NG"]
+	path = skse-plugin/CommonLibSSE-NG
+	url = https://github.com/CharmedBaryon/CommonLibSSE-NG.git
