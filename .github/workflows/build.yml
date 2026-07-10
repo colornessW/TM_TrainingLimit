@@ -38,7 +38,7 @@ jobs:
           ${{ runner.temp }}/vcpkg/vcpkg.exe install spdlog:x64-windows
 
       - name: Configure CMake
-        run: cmake -B build -S skse-plugin ${{ matrix.cmake_flags }} -DBUILD_TESTS=OFF -DSKSE_SUPPORT_XBYAK=OFF -DCMAKE_TOOLCHAIN_FILE="${{ runner.temp }}/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows
+        run: cmake -B build -S skse-plugin ${{ matrix.cmake_flags }} -DBUILD_TESTS=OFF -DSKSE_SUPPORT_XBYAK=OFF -DCMAKE_TOOLCHAIN_FILE="${{ runner.temp }}/vcpkg/scripts/buildsystems/vcpkg.cmake" -Dspdlog_DIR="${{ runner.temp }}/vcpkg/installed/x64-windows/share/spdlog" -DVCPKG_TARGET_TRIPLET=x64-windows
 
       - name: Build
         run: cmake --build build --config Release
