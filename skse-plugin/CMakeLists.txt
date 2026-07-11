@@ -22,6 +22,37 @@ set(SPDLOG_FMT_EXTERNAL OFF CACHE BOOL "" FORCE)
 set(SPDLOG_BUILD_SHARED OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(spdlog)
 
+if(NOT TARGET fmt::fmt)
+	add_library(spdlog_fmt INTERFACE)
+	target_include_directories(spdlog_fmt INTERFACE "${spdlog_SOURCE_DIR}/include")
+	add_library(fmt::fmt ALIAS spdlog_fmt)
+endif()
+
+set(fmt_INCLUDE_DIRS "" CACHE PATH "" FORCE)
+set(spdlog_INCLUDE_DIRS "" CACHE PATH "" FORCE)
+
+set(fmt_INCLUDE_DIRS "" CACHE PATH "" FORCE)
+set(spdlog_INCLUDE_DIRS "" CACHE PATH "" FORCE)
+
+file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/fmt-stub")
+file(WRITE "${CMAKE_BINARY_DIR}/fmt-stub/fmtConfig.cmake"
+	"if(NOT TARGET fmt::fmt)\n"
+	"  message(FATAL_ERROR \"fmt::fmt target not found\")\n"
+	"endif()\n"
+)
+file(WRITE "${CMAKE_BINARY_DIR}/fmt-stub/fmtConfigVersion.cmake"
+	"set(PACKAGE_VERSION \"10.2.1\")\n"
+	"if(PACKAGE_VERSION VERSION_LESS PACKAGE_FIND_VERSION)\n"
+	"  set(PACKAGE_VERSION_COMPATIBLE FALSE)\n"
+	"else()\n"
+	"  set(PACKAGE_VERSION_COMPATIBLE TRUE)\n"
+	"  if(PACKAGE_VERSION STREQUAL PACKAGE_FIND_VERSION)\n"
+	"    set(PACKAGE_VERSION_EXACT TRUE)\n"
+	"  endif()\n"
+	"endif()\n"
+)
+set(fmt_DIR "${CMAKE_BINARY_DIR}/fmt-stub" CACHE PATH "" FORCE)
+
 file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/spdlog-stub")
 file(WRITE "${CMAKE_BINARY_DIR}/spdlog-stub/spdlogConfig.cmake"
 	"if(NOT TARGET spdlog::spdlog)\n"
