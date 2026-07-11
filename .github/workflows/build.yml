@@ -35,12 +35,12 @@ jobs:
         run: |
           git clone https://github.com/Microsoft/vcpkg.git ${{ runner.temp }}/vcpkg
           ${{ runner.temp }}/vcpkg/bootstrap-vcpkg.bat
-          ${{ runner.temp }}/vcpkg/vcpkg.exe install spdlog:x64-windows-static rapidcsv:x64-windows-static
+          ${{ runner.temp }}/vcpkg/vcpkg.exe install spdlog:x64-windows rapidcsv:x64-windows
 
       - name: Configure CMake
         run: |
           $vcpkgRoot = "${{ runner.temp }}/vcpkg"
-          cmake -B build -S skse-plugin ${{ matrix.cmake_flags }} -DBUILD_TESTS=OFF -DSKSE_SUPPORT_XBYAK=OFF -DCMAKE_TOOLCHAIN_FILE="$vcpkgRoot/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows-static
+          cmake -B build -S skse-plugin ${{ matrix.cmake_flags }} -DBUILD_TESTS=OFF -DSKSE_SUPPORT_XBYAK=OFF -DCMAKE_TOOLCHAIN_FILE="$vcpkgRoot/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows
 
       - name: Build
         run: cmake --build build --config Release
@@ -51,6 +51,12 @@ jobs:
           Copy-Item build/Release/z_TM_TrainingLimit.dll dist/ -ErrorAction SilentlyContinue
           Copy-Item build/Release/z_TM_TrainingLimit.pdb dist/ -ErrorAction SilentlyContinue
           Copy-Item dist/TM_TrainingLimit.ini dist/ -ErrorAction SilentlyContinue
+          $binDir = "${{ runner.temp }}/vcpkg/installed/x64-windows/bin"
+          if (Test-Path $binDir) {
+            Copy-Item "$binDir/spdlog.dll" dist/ -ErrorAction SilentlyContinue
+            Copy-Item "$binDir/fmt.dll" dist/ -ErrorAction SilentlyContinue
+            Write-Host "Packaged spdlog.dll and fmt.dll"
+          }
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
