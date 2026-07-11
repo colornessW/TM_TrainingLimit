@@ -18,7 +18,7 @@ namespace
 		auto* ui = RE::UI::GetSingleton();
 		if (!ui) return;
 
-		auto* menu = ui->GetMenu<RE::TrainingMenu>();
+		auto menu = ui->GetMenu<RE::TrainingMenu>();
 		if (!menu) return;
 
 		auto& rt = menu->GetRuntimeData();
@@ -98,7 +98,7 @@ namespace
 			{
 				auto* ui = RE::UI::GetSingleton();
 				if (ui) {
-					auto* menu = ui->GetMenu<RE::TrainingMenu>();
+					auto menu = ui->GetMenu<RE::TrainingMenu>();
 					if (menu) {
 						skill = menu->GetRuntimeData().skill;
 					}
