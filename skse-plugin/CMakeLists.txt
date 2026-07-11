@@ -12,6 +12,35 @@ set(ENABLE_SKYRIM_VR ON CACHE BOOL "Enable Skyrim VR support")
 set(BUILD_TESTS OFF CACHE BOOL "Disable CommonLibSSE-NG tests" FORCE)
 set(SKSE_SUPPORT_XBYAK OFF CACHE BOOL "Disable Xbyak" FORCE)
 
+include(FetchContent)
+FetchContent_Declare(spdlog
+	GIT_REPOSITORY https://github.com/gabime/spdlog.git
+	GIT_TAG v1.14.1
+	GIT_SHALLOW TRUE
+)
+set(SPDLOG_FMT_EXTERNAL OFF CACHE BOOL "" FORCE)
+set(SPDLOG_BUILD_SHARED OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(spdlog)
+
+file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/spdlog-stub")
+file(WRITE "${CMAKE_BINARY_DIR}/spdlog-stub/spdlogConfig.cmake"
+	"if(NOT TARGET spdlog::spdlog)\n"
+	"  message(FATAL_ERROR \"spdlog::spdlog target not found\")\n"
+	"endif()\n"
+)
+file(WRITE "${CMAKE_BINARY_DIR}/spdlog-stub/spdlogConfigVersion.cmake"
+	"set(PACKAGE_VERSION \"1.14.1\")\n"
+	"if(PACKAGE_VERSION VERSION_LESS PACKAGE_FIND_VERSION)\n"
+	"  set(PACKAGE_VERSION_COMPATIBLE FALSE)\n"
+	"else()\n"
+	"  set(PACKAGE_VERSION_COMPATIBLE TRUE)\n"
+	"  if(PACKAGE_VERSION STREQUAL PACKAGE_FIND_VERSION)\n"
+	"    set(PACKAGE_VERSION_EXACT TRUE)\n"
+	"  endif()\n"
+	"endif()\n"
+)
+set(spdlog_DIR "${CMAKE_BINARY_DIR}/spdlog-stub" CACHE PATH "" FORCE)
+
 set(COMMONLIBSSE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CommonLibSSE-NG" CACHE PATH "Path to CommonLibSSE-NG source tree")
 
 add_subdirectory(

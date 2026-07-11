@@ -35,12 +35,12 @@ jobs:
         run: |
           git clone https://github.com/Microsoft/vcpkg.git ${{ runner.temp }}/vcpkg
           ${{ runner.temp }}/vcpkg/bootstrap-vcpkg.bat
-          ${{ runner.temp }}/vcpkg/vcpkg.exe install spdlog:x64-windows-static-md rapidcsv:x64-windows-static-md --overlay-triplets=skse-plugin/triplets
+          ${{ runner.temp }}/vcpkg/vcpkg.exe install rapidcsv:x64-windows
 
       - name: Configure CMake
         run: |
           $vcpkgRoot = "${{ runner.temp }}/vcpkg"
-          cmake -B build -S skse-plugin ${{ matrix.cmake_flags }} -DBUILD_TESTS=OFF -DSKSE_SUPPORT_XBYAK=OFF -DCMAKE_TOOLCHAIN_FILE="$vcpkgRoot/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows-static-md -DVCPKG_OVERLAY_TRIPLETS=skse-plugin/triplets
+          cmake -B build -S skse-plugin ${{ matrix.cmake_flags }} -DBUILD_TESTS=OFF -DSKSE_SUPPORT_XBYAK=OFF -DCMAKE_TOOLCHAIN_FILE="$vcpkgRoot/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows
 
       - name: Build
         run: cmake --build build --config Release
