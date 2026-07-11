@@ -73,4 +73,5 @@ endif()
 set_target_properties(${PROJECT_NAME} PROPERTIES
 	PREFIX ""
 	OUTPUT_NAME "z_TM_TrainingLimit"
+	MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
 )
